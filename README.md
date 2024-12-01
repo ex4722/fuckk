@@ -1,5 +1,5 @@
-# Sample Plugin
-Author: **Vector 35 Inc**
+# Fuckk
+Author: **thy.isnis**
 
 _Fix's `printk` for linux kernel binaries by replacing it with corresponding printk macro_
 
@@ -10,5 +10,3 @@ _Fix's `printk` for linux kernel binaries by replacing it with corresponding pri
 ## License
 
 This plugin is released under an [MIT license](./license).
-
-Either create a custom string type that just had log level embedded. 
