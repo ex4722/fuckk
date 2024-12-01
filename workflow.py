@@ -53,7 +53,6 @@ def fuckk_printk(analysis_context: core.BNAnalysisContext):
     printk = find_printk_in_extern(bv)
     assert printk is not None
     if not bv.get_section_by_name(".macro"):
-        print("CREATING MACRO")
         create_printk_macros(bv)
     for idx in range(len(func.mlil)-1):
         mlil_instr:MediumLevelILInstruction = func.mlil[idx]
@@ -63,12 +62,15 @@ def fuckk_printk(analysis_context: core.BNAnalysisContext):
                 print(f"FOUND IT BITCH @ {mlil_instr}")
                 log_level, fmstr= extract_level_and_fmstr_from_instruction(bv, mlil_instr) 
                 # Constructing new mlil 
-                output_len, output_expr, dest, params_len, _ = mlil_instr.instr.operands
+                output_len, output_expr, dest, params_len, params = mlil_instr.instr.operands
 
                 log_function = bv.get_symbols_by_name(LOG_LEVELS[log_level])[0].address
                 mlil_func = func.mlil.expr(MediumLevelILOperation.MLIL_CONST_PTR, ExpressionIndex(log_function))
                 mlil_const_ptr = func.mlil.expr(MediumLevelILOperation.MLIL_CONST_PTR, ExpressionIndex(fmstr))
-                call_param = func.mlil.expr(MediumLevelILOperation.MLIL_CALL_PARAM,2,func.mlil.add_operand_list([mlil_const_ptr]))
+
+                params = list(x.expr_index for x in mlil_instr.params)
+                params[0] = mlil_const_ptr
+                call_param = func.mlil.expr(MediumLevelILOperation.MLIL_CALL_PARAM,params_len,func.mlil.add_operand_list(params))
 
                 mlil_intrinsic = func.mlil.expr(MediumLevelILOperation.MLIL_CALL,output_len, output_expr, mlil_func, params_len, call_param-1)
                 print(f"Replacing {func.mlil[idx]} with {mlil_intrinsic} @ {hex(mlil_instr.address)}")
